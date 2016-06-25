@@ -10,8 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.util.*;
 import java.util.List;
 
 public class LoginWindow {
@@ -25,11 +23,7 @@ public class LoginWindow {
     private JTextField txtDatabase;
     private static Logger logger = Logger.getLogger(LoginWindow.class);
     private static JFrame frame;
-
-    public static ImageIcon loadingIcon = new ImageIcon("images/loading.gif");
-
     public LoginWindow() {
-        logger.info("application directory: " + LoginWindow.class.getResource("/").getPath());
         btnConnect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

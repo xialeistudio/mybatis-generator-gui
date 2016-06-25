@@ -23,7 +23,7 @@ public class GenerateWorker {
     public interface OnGenerateCompleteListener {
         public void onSuccess(String msg);
 
-        public void onError(String message,@Nullable Throwable ex);
+        public void onError(String message, @Nullable Throwable ex);
     }
 
     private String src;
@@ -57,6 +57,8 @@ public class GenerateWorker {
         Configuration configuration = new Configuration();
         //jdbc
         Context context = new Context(null);
+        context.setTargetRuntime("MyBatis3");
+        context.setId("table2orm");
         JDBCConnectionConfiguration jdbcConnectionConfiguration = new JDBCConnectionConfiguration();
         jdbcConnectionConfiguration.setConnectionURL(dbUtil.buildConnectionString(dbUtil));
         jdbcConnectionConfiguration.setPassword(dbUtil.getPassword());
@@ -77,6 +79,7 @@ public class GenerateWorker {
         JavaClientGeneratorConfiguration javaClientGeneratorConfiguration = new JavaClientGeneratorConfiguration();
         javaClientGeneratorConfiguration.setTargetPackage(daoPkg);
         javaClientGeneratorConfiguration.setTargetProject(src);
+        javaClientGeneratorConfiguration.setConfigurationType("XMLMAPPER");
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         for (TableEntity tableEntity : tableEntities) {
@@ -111,22 +114,22 @@ public class GenerateWorker {
     private ProgressCallback progressCallback = new ProgressCallback() {
         @Override
         public void introspectionStarted(int i) {
-            logger.debug("introspectionStarted => " + tableEntities.get(i).getTableName());
+            logger.debug("introspectionStarted => " + i);
         }
 
         @Override
         public void generationStarted(int i) {
-            logger.debug("generationStarted => " + tableEntities.get(i).getTableName());
+            logger.debug("generationStarted => " + i);
         }
 
         @Override
         public void saveStarted(int i) {
-            logger.debug("saveStarted => " + tableEntities.get(i).getTableName());
+            logger.debug("saveStarted => " + i);
         }
 
         @Override
         public void startTask(String s) {
-            logger.debug("startTask => " + s);
+            label.setText(s);
         }
 
         @Override
@@ -136,7 +139,6 @@ public class GenerateWorker {
 
         @Override
         public void checkCancel() throws InterruptedException {
-            listener.onError("操作失败", null);
         }
     };
 }

@@ -255,6 +255,19 @@ public class Dashboard {
                     labelStatus.setText(msg);
                     btnGenerate.setEnabled(true);
                     btnRefreshTable.setEnabled(true);
+
+                    //打开生成后文件夹
+                    String[] cmd = new String[5];
+                    cmd[0] = "cmd";
+                    cmd[1] = "/c";
+                    cmd[2] = "start";
+                    cmd[3] = " ";
+                    cmd[4] = src;
+                    try {
+                        Runtime.getRuntime().exec(cmd);
+                    } catch (IOException e) {
+                        logger.error(e);
+                    }
                 }
 
                 @Override
