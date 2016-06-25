@@ -15,10 +15,10 @@ import java.util.concurrent.ExecutionException;
  */
 public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
 
-    public static interface OnLoadedListener {
-        public void onSuccess(List<TableEntity> list);
+    public interface OnLoadedListener {
+        void onSuccess(List<TableEntity> list);
 
-        public void onError(String message, Throwable ex);
+        void onError(String message, Throwable ex);
     }
 
     private String host;

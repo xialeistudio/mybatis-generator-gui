@@ -68,10 +68,8 @@ public class LoginWindow {
         getTablesWorker.setListener(new GetTablesWorker.OnLoadedListener() {
             @Override
             public void onSuccess(List<TableEntity> list) {
-                for (TableEntity tableEntity : list) {
-                    logger.info(tableEntity.getTableName() + " => " + tableEntity.getEntityName());
-                }
-                //todo:启动表格管理
+                new Dashboard(list);
+                frame.dispose();
             }
 
             @Override
