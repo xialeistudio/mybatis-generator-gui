@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
@@ -61,14 +62,23 @@ public class LoginWindow {
         });
     }
 
-    private void connect(String host, String port, String username, String password, String type, String database) {
+    private void connect(final String host, final String port, final String username, final String password, final String type, final String database) {
         btnConnect.setText("连接中");
         btnConnect.setEnabled(false);
         GetTablesWorker getTablesWorker = new GetTablesWorker(host, port, username, password, type, database);
         getTablesWorker.setListener(new GetTablesWorker.OnLoadedListener() {
             @Override
             public void onSuccess(List<TableEntity> list) {
-                new Dashboard(list);
+                DbUtil.Type dbType;
+                switch (type) {
+                    case "Oracle":
+                        dbType = DbUtil.Type.Oracle;
+                        break;
+                    default:
+                        dbType = DbUtil.Type.MySQL;
+                        break;
+                }
+                new Dashboard(new DbUtil(host, port, username, password, dbType, database));
                 frame.dispose();
             }
 

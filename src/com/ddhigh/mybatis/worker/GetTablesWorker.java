@@ -3,6 +3,7 @@ package com.ddhigh.mybatis.worker;
 import com.ddhigh.mybatis.entity.TableEntity;
 import com.ddhigh.mybatis.util.DbUtil;
 import com.ddhigh.mybatis.util.StringUtil;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import java.util.concurrent.ExecutionException;
  * 获取数据库列表
  */
 public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
+    private static Logger logger = Logger.getLogger(GetTablesWorker.class);
 
     public interface OnLoadedListener {
         void onSuccess(List<TableEntity> list);
@@ -29,6 +31,10 @@ public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
     private String database;
     private OnLoadedListener listener;
 
+    private DbUtil dbUtil;
+
+    private long lastTimestamp;
+
     public GetTablesWorker(String host, String port, String user, String password, String type, String database) {
         this.host = host;
         this.port = port;
@@ -36,6 +42,14 @@ public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
         this.password = password;
         this.type = type;
         this.database = database;
+        logger.info("数据表加载线程启动");
+        lastTimestamp = System.currentTimeMillis();
+    }
+
+    public GetTablesWorker(DbUtil dbUtil) {
+        this.dbUtil = dbUtil;
+        logger.info("数据表加载线程启动");
+        lastTimestamp = System.currentTimeMillis();
     }
 
     public void setListener(OnLoadedListener listener) {
@@ -46,18 +60,24 @@ public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
     protected List<TableEntity> doInBackground() throws Exception {
         List<TableEntity> list = new ArrayList<>();
         DbUtil.Type dbType;
-        switch (type) {
-            case "MySQL":
-                dbType = DbUtil.Type.MySQL;
-                break;
-            case "Oracle":
-                dbType = DbUtil.Type.Oracle;
-                break;
-            default:
-                throw new UnsupportedOperationException("不支持的数据库类型");
+        if (type == null) {
+            dbType = dbUtil.getType();
+        } else {
+            switch (type) {
+                case "MySQL":
+                    dbType = DbUtil.Type.MySQL;
+                    break;
+                case "Oracle":
+                    dbType = DbUtil.Type.Oracle;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("不支持的数据库类型");
+            }
         }
 
-        DbUtil dbUtil = new DbUtil(host, port, user, password, dbType, database);
+        if (dbUtil == null) {
+            dbUtil = new DbUtil(host, port, user, password, dbType, database);
+        }
         ResultSet resultSet = dbUtil.query("SHOW TABLES", null);
         while (resultSet.next()) {
             String table = resultSet.getString(1);
@@ -76,5 +96,6 @@ public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
         } catch (InterruptedException | ExecutionException e) {
             listener.onError("连接数据库失败", e);
         }
+        logger.info("数据表加载线程退出，耗时 " + (System.currentTimeMillis() - lastTimestamp) + "ms");
     }
 }
