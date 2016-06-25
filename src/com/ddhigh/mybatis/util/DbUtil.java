@@ -96,28 +96,25 @@ public class DbUtil {
         this.database = database;
     }
 
-    public void connect() throws ClassNotFoundException, SQLException {
+    public String buildConnectionString(DbUtil dbUtil) {
+        if (dbUtil.type.equals(Type.MySQL)) {
+            return "jdbc:mysql://" + host + ":" + port + "/" + database;
+        } else if (type.equals(Type.Oracle)) {
+            return "jdbc:oracle:thin:@//" + host + ":" + port + "/" + database;
+        }
+        throw new UnsupportedOperationException("不支持的数据库类型");
+    }
+
+    private void connect() throws ClassNotFoundException, SQLException {
+        String connectString = buildConnectionString(this);
         if (type.equals(Type.MySQL)) {
             Class.forName("com.mysql.jdbc.Driver");
-            String sb = "jdbc:mysql://" +
-                    host +
-                    ":" +
-                    port +
-                    "/" +
-                    database;
-            connection = DriverManager.getConnection(sb, user, password);
         } else if (type.equals(Type.Oracle)) {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            String sb = "jdbc:oracle:thin:@//" +
-                    host +
-                    ":" +
-                    port +
-                    "/" +
-                    database;
-            connection = DriverManager.getConnection(sb, user, password);
         } else {
             throw new UnsupportedOperationException("不支持的数据库类型");
         }
+        connection = DriverManager.getConnection(connectString, user, password);
     }
 
     public ResultSet query(String sql, @Nullable Map<Integer, Object> params) throws SQLException, ClassNotFoundException {

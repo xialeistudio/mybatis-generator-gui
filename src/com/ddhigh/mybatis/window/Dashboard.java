@@ -3,9 +3,11 @@ package com.ddhigh.mybatis.window;
 import com.ddhigh.mybatis.entity.TableEntity;
 import com.ddhigh.mybatis.util.DbUtil;
 import com.ddhigh.mybatis.util.GUIUtil;
+import com.ddhigh.mybatis.worker.GenerateWorker;
 import com.ddhigh.mybatis.worker.GetTablesWorker;
 import com.ddhigh.mybatis.worker.MemoryMonitorWorker;
 import org.apache.log4j.Logger;
+import org.mybatis.generator.exception.InvalidConfigurationException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,6 +16,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,6 +35,7 @@ public class Dashboard {
     private JButton btnGenerate;
     private JTable tableTable;
     private JTextField txtEntity;
+    private JCheckBox checkBoxOverwrite;
     private DbUtil dbUtil;
 
     //生成参数区域
@@ -38,11 +43,13 @@ public class Dashboard {
     private String modelPkg;
     private String mapPkg;
     private String daoPkg;
+    protected boolean overwrite = true;
     private String entitySuffix = "Entity";
+    JFrame frame;
 
     public Dashboard(final DbUtil dbUtil) {
         this.dbUtil = dbUtil;
-        final JFrame frame = new JFrame("控制台");
+        frame = new JFrame("控制台");
         frame.setContentPane(container);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
@@ -86,6 +93,12 @@ public class Dashboard {
                 logger.info("entitySuffix => " + entitySuffix);
             }
         });
+        btnGenerate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generate();
+            }
+        });
         //启动监控线程
         launchMonitor();
         //首次加载表格
@@ -120,7 +133,8 @@ public class Dashboard {
                 btnRefreshTable.setEnabled(true);
                 btnGenerate.setEnabled(true);
                 labelStatus.setText("成功加载【" + list.size() + "】张数据表");
-                displayTableWithData(list);
+                tables = list;
+                displayTable();
             }
 
             @Override
@@ -141,19 +155,19 @@ public class Dashboard {
         tableColumnNames.add("实体类名");
     }
 
+    private List<TableEntity> tables;
+
     /**
      * 通过数据加载table
-     *
-     * @param list
      */
-    private void displayTableWithData(final List<TableEntity> list) {
-        for (TableEntity t : list) {
+    private void displayTable() {
+        for (TableEntity t : tables) {
             t.setEntityName(t.getEntityName() + entitySuffix);
         }
         tableTable.setModel(new TableModel() {
             @Override
             public int getRowCount() {
-                return list.size();
+                return tables.size();
             }
 
             @Override
@@ -178,7 +192,7 @@ public class Dashboard {
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-                TableEntity entity = list.get(rowIndex);
+                TableEntity entity = tables.get(rowIndex);
                 if (columnIndex == 0) {
                     return rowIndex + 1;
                 }
@@ -194,7 +208,7 @@ public class Dashboard {
             @Override
             public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
                 if (columnIndex == 2) {
-                    TableEntity entity = list.get(rowIndex);
+                    TableEntity entity = tables.get(rowIndex);
                     entity.setEntityName(aValue.toString());
                     logger.debug("[" + rowIndex + "][" + columnIndex + "] - " + aValue);
                 }
@@ -216,4 +230,48 @@ public class Dashboard {
         tableColumn.setMinWidth(48);
         tableTable.validate();
     }
+
+    /**
+     * 生成XML
+     */
+    private void generate() {
+        src = txtSrc.getText().trim();
+        modelPkg = txtModelPkg.getText().trim();
+        mapPkg = txtMapPkg.getText().trim();
+        daoPkg = txtDaoPkg.getText().trim();
+        overwrite = checkBoxOverwrite.isSelected();
+        if (src.equals("请选择生成的src根目录") || modelPkg.isEmpty() || mapPkg.isEmpty() || daoPkg.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "请将信息填写完整");
+            return;
+        }
+        labelStatus.setText("生成中");
+        btnGenerate.setEnabled(false);
+        btnRefreshTable.setEnabled(false);
+        try {
+            GenerateWorker worker = new GenerateWorker(src, modelPkg, mapPkg, daoPkg, tables, labelStatus, overwrite, dbUtil);
+            worker.setListener(new GenerateWorker.OnGenerateCompleteListener() {
+                @Override
+                public void onSuccess(String msg) {
+                    labelStatus.setText(msg);
+                    btnGenerate.setEnabled(true);
+                    btnRefreshTable.setEnabled(true);
+                }
+
+                @Override
+                public void onError(String message, Throwable ex) {
+                    labelStatus.setText(message);
+                    btnGenerate.setEnabled(true);
+                    btnRefreshTable.setEnabled(true);
+                    logger.error(message, ex);
+                }
+            });
+            worker.execute();
+        } catch (InterruptedException | InvalidConfigurationException | SQLException | IOException e) {
+            logger.error(e);
+            labelStatus.setText(e.getMessage());
+            btnGenerate.setEnabled(true);
+            btnRefreshTable.setEnabled(true);
+        }
+    }
+
 }
