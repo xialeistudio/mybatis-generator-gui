@@ -94,7 +94,7 @@ public class LoginWindow {
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        frame = new JFrame("LoginWindow");
+        frame = new JFrame("连接数据库");
         frame.setContentPane(new LoginWindow().container);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();

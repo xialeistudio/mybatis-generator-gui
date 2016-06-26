@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
 import org.mybatis.generator.exception.InvalidConfigurationException;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.TableModelListener;
+import javax.swing.event.*;
 import javax.swing.table.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -50,6 +50,7 @@ public class Dashboard {
     public Dashboard(final DbUtil dbUtil) {
         this.dbUtil = dbUtil;
         frame = new JFrame("控制台");
+        setupMenu();
         frame.setContentPane(container);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
@@ -103,6 +104,26 @@ public class Dashboard {
         launchMonitor();
         //首次加载表格
         launchTableLoader();
+    }
+
+    /**
+     * 初始化菜单
+     */
+    private void setupMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("帮助(H)");
+        menu.setMnemonic('H');
+        JMenuItem menuItem = new JMenuItem("关于(A)");
+        menuItem.setMnemonic('A');
+        menu.add(menuItem);
+        menuBar.add(menu);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AboutDialog();
+            }
+        });
+        frame.setJMenuBar(menuBar);
     }
 
     /**
@@ -240,6 +261,7 @@ public class Dashboard {
         mapPkg = txtMapPkg.getText().trim();
         daoPkg = txtDaoPkg.getText().trim();
         overwrite = checkBoxOverwrite.isSelected();
+        entitySuffix = txtEntity.getText().trim();
         if (src.equals("请选择生成的src根目录") || modelPkg.isEmpty() || mapPkg.isEmpty() || daoPkg.isEmpty()) {
             JOptionPane.showMessageDialog(frame, "请将信息填写完整");
             return;

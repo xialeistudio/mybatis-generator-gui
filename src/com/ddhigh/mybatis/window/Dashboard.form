@@ -19,7 +19,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="cfb44" layout-manager="GridLayoutManager" row-count="7" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="cfb44" layout-manager="GridLayoutManager" row-count="8" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="4" bottom="0" right="4"/>
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
@@ -37,7 +37,7 @@
               </component>
               <vspacer id="daa4d">
                 <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                 </constraints>
               </vspacer>
               <component id="745da" class="javax.swing.JTextField" binding="txtSrc">
@@ -109,7 +109,7 @@
               </component>
               <grid id="2a36e" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
                 <constraints>
-                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
@@ -117,7 +117,7 @@
                   <component id="15b97" class="javax.swing.JButton" binding="btnRefreshTable">
                     <constraints/>
                     <properties>
-                      <text value="刷新表"/>
+                      <text value="重新加载"/>
                     </properties>
                   </component>
                   <component id="825a" class="javax.swing.JButton" binding="btnGenerate">
@@ -150,11 +150,19 @@
               </component>
               <component id="39622" class="javax.swing.JCheckBox" binding="checkBoxOverwrite">
                 <constraints>
-                  <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <selected value="true"/>
                   <text value="存在则覆盖"/>
+                </properties>
+              </component>
+              <component id="e2116" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="更改后请重新加载"/>
                 </properties>
               </component>
             </children>
@@ -164,13 +172,16 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
-            <border type="line" title-resource-bundle="messages" title-key="table">
+            <border type="none" title-resource-bundle="messages" title-key="table">
               <color color="-4473925"/>
             </border>
             <children>
               <component id="b0b0a" class="javax.swing.JTable" binding="tableTable">
                 <constraints/>
-                <properties/>
+                <properties>
+                  <dropMode value="USE_SELECTION"/>
+                  <fillsViewportHeight value="true"/>
+                </properties>
               </component>
             </children>
           </scrollpane>

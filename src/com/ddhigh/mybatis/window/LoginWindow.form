@@ -56,7 +56,6 @@
             <properties>
               <model>
                 <item value="MySQL"/>
-                <item value="Oracle"/>
               </model>
             </properties>
           </component>
