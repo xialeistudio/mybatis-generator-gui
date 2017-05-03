@@ -88,12 +88,6 @@ public class LoginWindow {
     }
 
     public static void main(String[] args) {
-        GUIUtil.setFont(new Font("Microsoft Yahei", Font.PLAIN, 12));
-        try {
-            UIManager.setLookAndFeel(GUIUtil.LOOK_AND_FEEL_WINDOWS);
-        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
         frame = new JFrame("连接数据库");
         frame.setContentPane(new LoginWindow().container);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
