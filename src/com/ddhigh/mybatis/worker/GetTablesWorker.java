@@ -94,7 +94,7 @@ public class GetTablesWorker extends SwingWorker<List<TableEntity>, String> {
         try {
             listener.onSuccess(get());
         } catch (InterruptedException | ExecutionException e) {
-            listener.onError("连接数据库失败", e);
+            listener.onError("连接数据库失败:" + e.getLocalizedMessage(), e);
         }
         logger.info("数据表加载线程退出，耗时 " + (System.currentTimeMillis() - lastTimestamp) + "ms");
     }
