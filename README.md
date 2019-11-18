@@ -8,9 +8,5 @@
 ## License
 MIT
 
-## Next Steps
-+ [ ] 使用JavaFx重构
-+ [ ] 支持更多数据库
-
 ## 我的博客
 [每天进步一点点](https://www.ddhigh.com)
