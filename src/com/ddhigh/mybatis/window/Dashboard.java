@@ -10,12 +10,13 @@ import org.apache.log4j.Logger;
 import org.mybatis.generator.exception.InvalidConfigurationException;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -231,7 +232,6 @@ public class Dashboard {
                 if (columnIndex == 2) {
                     TableEntity entity = tables.get(rowIndex);
                     entity.setEntityName(aValue.toString());
-                    logger.debug("[" + rowIndex + "][" + columnIndex + "] - " + aValue);
                 }
             }
 
@@ -269,32 +269,45 @@ public class Dashboard {
         labelStatus.setText("生成中");
         btnGenerate.setEnabled(false);
         btnRefreshTable.setEnabled(false);
-        try {
+//        try {
+//
+//        } catch (InterruptedException | InvalidConfigurationException | SQLException | IOException e) {
+//
+//        }
+        new Thread(() -> {
             GenerateWorker worker = new GenerateWorker(src, modelPkg, mapPkg, daoPkg, tables, labelStatus, overwrite, dbUtil);
             worker.setListener(new GenerateWorker.OnGenerateCompleteListener() {
                 @Override
                 public void onSuccess(String msg) {
-                    labelStatus.setText(msg);
-                    btnGenerate.setEnabled(true);
-                    btnRefreshTable.setEnabled(true);
-                    JOptionPane.showMessageDialog(null, "生成成功!");
+                    SwingUtilities.invokeLater(() -> {
+                        labelStatus.setText(msg);
+                        btnGenerate.setEnabled(true);
+                        btnRefreshTable.setEnabled(true);
+                        JOptionPane.showMessageDialog(null, "生成成功!");
+                    });
                 }
 
                 @Override
                 public void onError(String message, Throwable ex) {
-                    labelStatus.setText(message);
-                    btnGenerate.setEnabled(true);
-                    btnRefreshTable.setEnabled(true);
-                    logger.error(message, ex);
+                    SwingUtilities.invokeLater(() -> {
+                        labelStatus.setText(message);
+                        btnGenerate.setEnabled(true);
+                        btnRefreshTable.setEnabled(true);
+                        logger.error(message, ex);
+                    });
                 }
             });
-            worker.execute();
-        } catch (InterruptedException | InvalidConfigurationException | SQLException | IOException e) {
-            logger.error(e);
-            labelStatus.setText(e.getMessage());
-            btnGenerate.setEnabled(true);
-            btnRefreshTable.setEnabled(true);
-        }
+            try {
+                worker.execute();
+            } catch (InvalidConfigurationException | InterruptedException | SQLException | IOException e) {
+                logger.error(e);
+                SwingUtilities.invokeLater(() -> {
+                    labelStatus.setText(e.getMessage());
+                    btnGenerate.setEnabled(true);
+                    btnRefreshTable.setEnabled(true);
+                });
+            }
+        }).start();
     }
 
 }

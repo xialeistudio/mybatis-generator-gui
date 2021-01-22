@@ -1,6 +1,5 @@
 package com.ddhigh.mybatis.util;
 
-import com.sun.istack.internal.Nullable;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -98,7 +97,7 @@ public class DbUtil {
 
     public String buildConnectionString(DbUtil dbUtil) {
         if (dbUtil.type.equals(Type.MySQL)) {
-            return "jdbc:mysql://" + host + ":" + port + "/" + database;
+            return "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&serverTimezone=Asia%2FShanghai";
         } else if (type.equals(Type.Oracle)) {
             return "jdbc:oracle:thin:@//" + host + ":" + port + "/" + database;
         }
@@ -108,7 +107,7 @@ public class DbUtil {
     private void connect() throws ClassNotFoundException, SQLException {
         String connectString = buildConnectionString(this);
         if (type.equals(Type.MySQL)) {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } else if (type.equals(Type.Oracle)) {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         } else {
@@ -117,7 +116,7 @@ public class DbUtil {
         connection = DriverManager.getConnection(connectString, user, password);
     }
 
-    public ResultSet query(String sql, @Nullable Map<Integer, Object> params) throws SQLException, ClassNotFoundException {
+    public ResultSet query(String sql, Map<Integer, Object> params) throws SQLException, ClassNotFoundException {
         if (connection == null || connection.isClosed()) {
             connect();
         }
@@ -130,7 +129,7 @@ public class DbUtil {
         return preparedStatement.executeQuery();
     }
 
-    public int execute(String sql, @Nullable Map<Integer, Object> params) throws SQLException, ClassNotFoundException {
+    public int execute(String sql, Map<Integer, Object> params) throws SQLException, ClassNotFoundException {
         if (connection == null || connection.isClosed()) {
             connect();
         }
