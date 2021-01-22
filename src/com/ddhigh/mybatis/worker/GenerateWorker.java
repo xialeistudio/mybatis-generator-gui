@@ -2,7 +2,6 @@ package com.ddhigh.mybatis.worker;
 
 import com.ddhigh.mybatis.entity.TableEntity;
 import com.ddhigh.mybatis.util.DbUtil;
-import com.sun.istack.internal.Nullable;
 import org.apache.log4j.Logger;
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.api.ProgressCallback;
@@ -15,15 +14,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class GenerateWorker {
-    private static Logger logger = Logger.getLogger(GetTablesWorker.class);
+    private static final Logger logger = Logger.getLogger(GetTablesWorker.class);
 
     public interface OnGenerateCompleteListener {
         public void onSuccess(String msg);
 
-        public void onError(String message, @Nullable Throwable ex);
+        public void onError(String message, Throwable ex);
     }
 
     private String src;
@@ -63,7 +61,7 @@ public class GenerateWorker {
         jdbcConnectionConfiguration.setConnectionURL(dbUtil.buildConnectionString(dbUtil));
         jdbcConnectionConfiguration.setPassword(dbUtil.getPassword());
         jdbcConnectionConfiguration.setUserId(dbUtil.getUser());
-        jdbcConnectionConfiguration.setDriverClass(dbUtil.getType().equals(DbUtil.Type.MySQL) ? "com.mysql.jdbc.Driver" : "oracle.jdbc.driver.OracleDriver");
+        jdbcConnectionConfiguration.setDriverClass(dbUtil.getType().equals(DbUtil.Type.MySQL) ? "com.mysql.cj.jdbc.Driver" : "oracle.jdbc.driver.OracleDriver");
         context.setJdbcConnectionConfiguration(jdbcConnectionConfiguration);
         //路径完成
         JavaModelGeneratorConfiguration javaModelGeneratorConfiguration = new JavaModelGeneratorConfiguration();

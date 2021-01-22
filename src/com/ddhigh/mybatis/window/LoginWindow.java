@@ -4,10 +4,10 @@ import com.ddhigh.mybatis.entity.TableEntity;
 import com.ddhigh.mybatis.util.DbUtil;
 import com.ddhigh.mybatis.util.GUIUtil;
 import com.ddhigh.mybatis.worker.GetTablesWorker;
+import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -88,6 +88,7 @@ public class LoginWindow {
     }
 
     public static void main(String[] args) {
+        FlatLightLaf.install();
         frame = new JFrame("连接数据库");
         frame.setContentPane(new LoginWindow().container);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
